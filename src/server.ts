@@ -28,10 +28,10 @@ const port: string = process.env.PORT || '8080'
   const dbMet: MetricsHandler = new MetricsHandler('./db/metrics')
 
   app.post('/metrics/:id', (req: any, res: any) => {
-    console.log('hello', req);
+    // console.log('hello', req);
     dbMet.save(req.params.id, req.body, (err: Error | null) => {
       if (err) throw err
-      res.status(200).send()
+      res.status(200).send('OK')
     })
   })
 
@@ -55,6 +55,19 @@ const port: string = process.env.PORT || '8080'
   })
 
   app.delete('/metrics/:id', (req: any, res: any) => {
+    // let receivedMetric;
+   
+  //  async () =>{
+  //   await dbMet.getById(req.params.id, (err: Error | null, result: any) =>{
+  //     console.log("Hello1");
+  //     receivedMetric = result;
+  //     console.log("Hello2");
+  //     console.log(receivedMetric);
+  //     console.log("Hello3");
+     
+  //   })
+  //  }
+   
 
     dbMet.deleteById(req.params.id, (err: Error | null, result: any) => {
       if (err) throw err

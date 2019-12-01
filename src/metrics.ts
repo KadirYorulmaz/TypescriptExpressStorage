@@ -31,8 +31,8 @@ export class MetricsHandler {
   }
 
   public save(key: number, metrics: Metric[], callback: (error: Error | null) => void) {
-    console.log(key);
-    console.log(metrics);
+    console.log('key: ',key);
+    // console.log('Metrics: ',metrics);
     const stream = WriteStream(this.db)
     stream.on('error', callback)
     stream.on('close', callback)
@@ -44,13 +44,13 @@ export class MetricsHandler {
 
 
   public getAll(callback: (error: Error | null, result: any | null) => void) {
-    let metrics: Metric[] = []  
+    let metrics: Metric[] = []
 
     this.db.createReadStream()
       .on('data', function (data) {
         // console.log(data.key, '=', data.value)
         // callback(null, data);
-        
+
         let timestamp: string = data.key.split(':')[1]
         let metric: Metric = new Metric(timestamp, data.value);
         // let metric: Metric = new Metric(data.key, data.value);
@@ -71,13 +71,16 @@ export class MetricsHandler {
   }
 
   public getById(key: number, callback: (error: Error | null, result: any | null) => void) {
-    let metrics: Metric[] = []  
+    
+
+    
+    let metrics: Metric[] = []
 
     this.db.createReadStream()
       .on('data', function (data) {
         console.log(key);
         console.log(data.value);
-        if(data.value === key){
+        if (data.value === key) {
           let timestamp: string = data.key.split(':')[1]
           let metric: Metric = new Metric(timestamp, data.value);
           // let metric: Metric = new Metric(data.key, data.value);
@@ -102,39 +105,36 @@ export class MetricsHandler {
 
 
   public deleteById(key: number, callback: (error: Error | null, result: any | null) => void) {
-    let metrics: Metric[] = []  
+        // console.log('m: ',metrics);
 
-    // this.db.del('data', function (err) {
-    //   if (err)
-    //     // handle I/O or other error
-    // })
-    
-    this.db.del()
-      .on('data', function (data) {
-        // console.log(key);
-        // console.log(data.value);
-        // if(data.value === key){
-        //   let timestamp: string = data.key.split(':')[1]
-        //   let metric: Metric = new Metric(timestamp, data.value);
-        //   // let metric: Metric = new Metric(data.key, data.value);
-        //   console.log(metric);
-        //   console.log(data.key);
-        //   metrics.push(metric)
-        //   // metrics.push(data)
-          console.log(data);
-        // }
-      })
-      .on('error', function (err) {
-        callback(err, null);
+      var ws = WriteStream(this.db)
+      // console.log(ws);
+      ws.on('error', function (err) {
         console.log('Oh my!', err)
       })
-      .on('close', function () {
+      ws.on('close', function () {
         console.log('Stream closed')
       })
-      .on('end', function () {
-        callback(null, metrics);
-        console.log('Stream ended')
+      
+      ws.write({ type: 'del', key: 'Metric { timestamp: 1, value: 85 }'})
+
+      // key: `metric:${key}:${m.timestamp}`, value: m.value }
+
+      // ws.write({ type: 'del', key: ourKey })
+      // metrics.forEach((m: Metric) => {
+      //   console.log('m: ',metrics);
+      //   ws.write({ type: 'del', key: '10'})
+      
+      //   // stream.write({ key: `metric:${key}:${m.timestamp}`, value: m.value })
+      // })
+
+      
+      ws.on('end', function () {
+        console.log('Stream closed2')
+         callback(null, null);
       })
+  
+    
   }
 
 }
